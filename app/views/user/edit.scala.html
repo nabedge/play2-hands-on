@@ -1,0 +1,29 @@
+@* formのインスタンスと、会社名をセレクトボックスで選択するためのlistを受け取る*@
+@(userForm: Form[controllers.UserController.UserForm], companies: List[models.Tables.CompaniesRow])
+
+@* テンプレートで利用可能なヘルパーをインポート *@
+@import helper._
+
+@main("ユーザーの作成または編集"){
+
+    @* idがある場合は更新処理、無い場合は新規登録 *@
+    @form(userForm.value.map(x => routes.UserController.update)
+            .getOrElse(routes.UserController.create()), 'class -> "container", 'role -> "form"){
+        <fieldset>
+            <div class="form-group">
+                @inputText(userForm("name"), '_label -> "名前")
+            </div>
+            <div class="form-group">
+                @select(userForm("companyId"), companies.map(x => x.id.toString -> x.name).toSeq,
+                    '_label -> "会社", '_default -> "-- 会社名を選択してください --")
+            </div>
+            @* idがある場合（更新の場合）のみhiddenを出力する *@
+            @userForm("id").value.map{ value =>
+              <input type="hidden" name="id" value="@value" />
+            }
+            <div>
+                <input type="submit" value="保存" class="btn btn-success">
+            </div>
+        </fieldset>
+    }
+}
